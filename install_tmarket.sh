@@ -88,35 +88,4 @@ rm /etc/nginx/sites-enabled/default
 
 # Cấu hình header cho tmarket.haiphong.online
 echo "Cấu hình header cho tmarket.haiphong.online..."
-cat > /etc/nginx/conf.d/tmarket-header.conf <<EOF
-server {
-    listen 80;
-    server_name tmarket.haiphong.online;
-
-    location / {
-        add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
-    }
-}
-EOF
-
-# Cài đặt Let's Encrypt cho tmarket.edu.vn
-echo "Cài đặt Let's Encrypt cho tmarket.edu.vn..."
-certbot certonly --nginx -d tmarket.edu.vn
-
-# Cài đặt Let's Encrypt cho tmarket.haiphong.online
-echo "Cài đặt Let's Encrypt cho tmarket.haiphong.online..."
-certbot certonly --nginx -d tmarket.haiphong.online
-
-# Cấu hình chuyển hướng từ HTTP (port 80) sang HTTPS (port 443) cho tmarket.edu.vn và tmarket.haiphong.online
-echo "Cấu hình chuyển hướng từ HTTP sang HTTPS..."
-cat > /etc/nginx/conf.d/redirect.conf <<EOF
-server {
-    listen 80;
-    server_name tmarket.edu.vn tmarket.haiphong.online;
-    return 301 https://\$host\$request_uri;
-}
-EOF
-
-# Khởi động lại Nginx
-echo "Khởi động lại Nginx..."
-systemctl restart nginx
+cat > /etc/nginx/conf.d/tmarket
