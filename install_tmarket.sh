@@ -50,8 +50,8 @@ server {
     }
 
     location = /robots.txt {
-        add_header Content-Type text/plain;
-        echo "User-agent: *\nDisallow: /";
+        add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+        return 200 "User-agent: *\nDisallow: /";
     }
 }
 
@@ -72,8 +72,8 @@ server {
     }
 
     location = /robots.txt {
-        add_header Content-Type text/plain;
-        echo "User-agent: *\nDisallow: /";
+        add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+        return 200 "User-agent: *\nDisallow: /";
     }
 
     ssl_certificate /etc/letsencrypt/live/tmarket.edu.vn/fullchain.pem;
@@ -86,6 +86,28 @@ EOF
 ln -s /etc/nginx/sites-available/tmarket /etc/nginx/sites-enabled/
 rm /etc/nginx/sites-enabled/default
 
-# Cấu hình header cho tmarket.haiphong.online
-echo "Cấu hình header cho tmarket.haiphong.online..."
-cat > /etc/nginx/conf.d/tmarket
+# Cài đặt Certbot
+echo "Cài đặt Certbot..."
+apt-get install -y certbot python3-certbot-nginx
+
+# Cài đặt Let's Encrypt cho tmarket.edu.vn và tmarket.haiphong.online
+echo "Cài đặt Let's Encrypt cho tmarket.edu.vn và tmarket.haiphong.online..."
+certbot --nginx -d tmarket.edu.vn -d tmarket.haiphong.online
+
+# Chuyển hướng các yêu cầu từ cổng 80 sang cổng 443
+echo "Chuyển hướng tất cả các yêu cầu từ cổng 80 sang cổng 443..."
+cat > /etc/nginx/conf.d/redirect.conf <<EOF
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name _;
+
+    return 301 https://\$host\$request_uri;
+}
+EOF
+
+# Khởi động lại dịch vụ Nginx
+echo "Khởi động lại dịch vụ Nginx..."
+systemctl restart nginx
+echo "Done!"
